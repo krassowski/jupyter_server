@@ -107,6 +107,8 @@ class WebSocketMixin:
     @no_type_check
     def prepare(self, *args, **kwargs):
         """Handle a get request."""
+        print('a')
+        print( isinstance(self, JupyterHandler))
         if not isinstance(self, JupyterHandler):
             should_authenticate = not self.settings.get("allow_unauthenticated_access", False)
             if "identity_provider" in self.settings and should_authenticate:

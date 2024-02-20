@@ -631,22 +631,24 @@ class JupyterHandler(AuthenticatedHandler):
         if self.request.method not in {"GET", "HEAD", "OPTIONS"}:
             self.check_xsrf_cookie()
 
+        print(0)
+        print(user)
         if not self.settings.get("allow_unauthenticated_access", False):
+            print(1)
             if not self.request.method:
                 raise HTTPError(403)
             method = getattr(self, self.request.method.lower())
             if not getattr(method, "__allow_unauthenticated", False):
                 if _redirect_to_login:
+                    print(2)
                     # reuse `web.authenticated` logic, which redirects to the login
                     # page on GET and HEAD and otherwise raises 403
                     return web.authenticated(lambda _: super().prepare())(self)
                 else:
+                    print(3)
                     # raise 403 if user is not known without redirecting to login page
-                    user = self.current_user
                     if user is None:
-                        self.log.warning(
-                            f"Couldn't authenticate {self.__class__.__name__} connection"
-                        )
+                        self.log.warning("Couldn't authenticate connection")
                         raise web.HTTPError(403)
 
         return super().prepare()
