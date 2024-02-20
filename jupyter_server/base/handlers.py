@@ -616,6 +616,8 @@ class JupyterHandler(AuthenticatedHandler):
             )
             user = User(self.get_current_user())
         else:
+            # the problem is here - it should be returning None when Auth is non, right?
+            print('identity provider is', self.identity_provider)
             _user = self.identity_provider.get_user(self)
             if isinstance(_user, Awaitable):
                 # IdentityProvider.get_user _may_ be async
