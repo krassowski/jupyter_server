@@ -230,6 +230,7 @@ class IdentityProvider(LoggingConfigurable):
             # already authenticated
             return t.cast(User, handler._jupyter_current_user)  # type:ignore[attr-defined]
         _token_user: User | None | t.Awaitable[User | None] = self.get_user_token(handler)
+        print('token user', _token_user)
         if isinstance(_token_user, t.Awaitable):
             print('awaiting token')
             _token_user = await _token_user
@@ -441,10 +442,12 @@ class IdentityProvider(LoggingConfigurable):
         - None if not
         """
         token = t.cast("str | None", handler.token)  # type:ignore[attr-defined]
+        print('token', token)
         if not token:
             return None
         # check login token from URL argument or Authorization header
         user_token = self.get_token(handler)
+        print('user_token', user_token)
         authenticated = False
         if user_token == token:
             # token-authenticated, set the login cookie
@@ -459,6 +462,7 @@ class IdentityProvider(LoggingConfigurable):
             # which is stored in a cookie.
             # still check the cookie for the user id
             _user = self.get_user_cookie(handler)
+            print('user', _user)
             if isinstance(_user, t.Awaitable):
                 _user = await _user
             user: User | None = _user
