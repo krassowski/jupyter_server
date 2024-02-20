@@ -427,11 +427,13 @@ class IdentityProvider(LoggingConfigurable):
         - in header: Authorization: token <token>
         """
         user_token = handler.get_argument("token", "")
+        print('user_token from handler in get_token', user_token, handler)
         if not user_token:
             # get it from Authorization header
             m = self.auth_header_pat.match(handler.request.headers.get("Authorization", ""))
             if m:
                 user_token = m.group(2)
+            print('user_token from request in get_token', user_token, handler.request.headers)
         return user_token
 
     async def get_user_token(self, handler: web.RequestHandler) -> User | None:
@@ -462,7 +464,7 @@ class IdentityProvider(LoggingConfigurable):
             # which is stored in a cookie.
             # still check the cookie for the user id
             _user = self.get_user_cookie(handler)
-            print('user', _user)
+            print('user')
             if isinstance(_user, t.Awaitable):
                 _user = await _user
             user: User | None = _user
