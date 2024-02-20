@@ -226,14 +226,17 @@ class IdentityProvider(LoggingConfigurable):
     async def _get_user(self, handler: web.RequestHandler) -> User | None:
         """Get the user."""
         if getattr(handler, "_jupyter_current_user", None):
+            print('getting user from _jupyter_current_user')
             # already authenticated
             return t.cast(User, handler._jupyter_current_user)  # type:ignore[attr-defined]
         _token_user: User | None | t.Awaitable[User | None] = self.get_user_token(handler)
         if isinstance(_token_user, t.Awaitable):
+            print('awaiting token')
             _token_user = await _token_user
         token_user: User | None = _token_user  # need second variable name to collapse type
         _cookie_user = self.get_user_cookie(handler)
         if isinstance(_cookie_user, t.Awaitable):
+            print('awaiting cookie user')
             _cookie_user = await _cookie_user
         cookie_user: User | None = _cookie_user
         # prefer token to cookie if both given,
@@ -244,12 +247,15 @@ class IdentityProvider(LoggingConfigurable):
             # if token-authenticated, persist user_id in cookie
             # if it hasn't already been stored there
             if user != cookie_user:
+                print('setting login cookie')
                 self.set_login_cookie(handler, user)
             # Record that the current request has been authenticated with a token.
             # Used in is_token_authenticated above.
             handler._token_authenticated = True  # type:ignore[attr-defined]
+            print('recording _token_authenticated')
 
         if user is None:
+            print('user was none!')
             # If an invalid cookie was sent, clear it to prevent unnecessary
             # extra warnings. But don't do this on a request with *no* cookie,
             # because that can erroneously log you out (see gh-3365)
@@ -259,6 +265,7 @@ class IdentityProvider(LoggingConfigurable):
                 self.log.warning(f"Clearing invalid/expired login cookie {cookie_name}")
                 self.clear_login_cookie(handler)
             if not self.auth_enabled:
+                print('generating anonymous user with generate_anonymous_user!')
                 # Completely insecure! No authentication at all.
                 # No need to warn here, though; validate_security will have already done that.
                 user = self.generate_anonymous_user(handler)
