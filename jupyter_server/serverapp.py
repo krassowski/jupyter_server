@@ -3124,7 +3124,9 @@ class ServerApp(JupyterApp):
         """
         try:
             await self.extension_manager.start_all_extensions()
+            print("OKOKOK")
         except Exception as err:
+            print("NOPE", err)
             self.log.error(err)
 
         info = self.log.info
