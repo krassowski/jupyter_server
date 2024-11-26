@@ -3129,6 +3129,8 @@ class ServerApp(JupyterApp):
             self.log.info(f"NOPE {err}")
             self.log.error(err)
 
+        self.log.info("Returning early without criticals")
+        return
         info = self.log.info
         for line in self.running_server_info(kernel_count=False).split("\n"):
             info(line)
