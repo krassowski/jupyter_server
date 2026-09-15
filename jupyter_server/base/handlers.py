@@ -1066,6 +1066,11 @@ class FileFindHandler(JupyterHandler, web.StaticFileHandler):
             if (absolute_path + os.sep).startswith(root):
                 break
 
+        # tornado >= 6.5.9 checks symlink targets against this attribute, which its
+        # own initialize() sets. The search path means the root that matched is only
+        # known here. Older tornado never reads it.
+        self.allowed_symlink_directory = root
+
         return super().validate_absolute_path(root, absolute_path)
 
 
