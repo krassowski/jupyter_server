@@ -1009,7 +1009,13 @@ class FileFindHandler(JupyterHandler, web.StaticFileHandler):
         ):
             self.set_header("Cache-Control", "no-cache")
 
-    def initialize(
+    # tornado 6.5.9 took argument 3 of StaticFileHandler.initialize for
+    # allowed_symlink_directory; this handler has had no_cache_paths there since the
+    # notebook days. Harmless in practice: tornado binds these by name from the route
+    # kwargs (self.initialize(**kwargs)), so neither is ever passed positionally, and
+    # validate_absolute_path below sets allowed_symlink_directory itself, per request,
+    # to the root that matched.
+    def initialize(  # type: ignore[override]
         self,
         path: str | list[str],
         default_filename: str | None = None,
